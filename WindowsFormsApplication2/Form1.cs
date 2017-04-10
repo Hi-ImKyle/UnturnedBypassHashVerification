@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -20,6 +22,7 @@ namespace WindowsFormsApplication1
         }
 
         public string contentPath;
+        public string serverName;
 
         private void TextBox1_Click(object sender, EventArgs e)
         {
@@ -31,12 +34,18 @@ namespace WindowsFormsApplication1
 
         public void ScanContentFolder(string path)
         {
+            ListBox1.Items.Clear();
             if (!path.Contains("Workshop\\Content"))
             {
                 MessageBox.Show(this, "This doesn't look like the correct directory \nPlease check again", "Check again", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
                 return;
             }
             string[] modsF = Directory.GetDirectories(path);
+            if(!File.Exists(modsF[0] + "\\mod.usoinfo"))
+            {
+                Process.Start("https://github.com/Like50Wizards/UnturnedBypassHashVerification#when-i-restart-uso-i-have-to-apply-the-fix-again-why");
+                return;
+            }
             foreach(string folder in modsF)
             {
                 ListBox1.Items.Add("< " + folder.Replace(path + "\\", "") + " > " + File.ReadLines(folder + "\\mod.usoinfo").First());
@@ -45,6 +54,12 @@ namespace WindowsFormsApplication1
             {
                 button1.Enabled = true;
                 contentPath = path;
+                RegistryKey key;
+                key = Registry.CurrentUser.CreateSubKey("BypassHash");
+                key.SetValue("ContentPath", contentPath);
+                string[] splitServerDir = contentPath.Replace("\\Workshop\\Content", "").Split("\\".ToCharArray());
+                serverName = splitServerDir[splitServerDir.Length - 1];
+                Label2.Text = "Are these your mods installed on '" + serverName + "'?";
             }
         }
 
@@ -55,12 +70,19 @@ namespace WindowsFormsApplication1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            foreach(var listBoxItem in ListBox1.Items)
+            Thread patch = new Thread(new ThreadStart(patchTheServer));
+            patch.Start();
+            button1.Enabled = false;
+        }
+
+        public void patchTheServer()
+        {
+            foreach (var listBoxItem in ListBox1.Items)
             {
                 string modID = listBoxItem.ToString().Substring(2, 9);
                 //MessageBox.Show(contentPath + "\\" + modID);
                 string[] modFiles = Directory.GetDirectories(contentPath + "\\" + modID);
-                foreach(string cate in modFiles)
+                foreach (string cate in modFiles)
                 {
                     string[] cateFiles = Directory.GetDirectories(cate);
                     foreach (string item in cateFiles)
@@ -78,9 +100,9 @@ namespace WindowsFormsApplication1
                                     sw.WriteLine(Environment.NewLine);
                                     sw.WriteLine("Bypass_Hash_Verification");
                                 }
-                                Thread.Sleep(50);
-                                //MessageBox.Show(item.Replace(cate + "\\", "") + Environment.NewLine + Environment.NewLine + unityAssets + Environment.NewLine + Environment.NewLine + unityAssets.Replace(item + "\\", ""));
-                            }else
+                                Thread.Sleep(10);
+                            }
+                            else
                             {
                                 continue;
                             }
@@ -90,11 +112,36 @@ namespace WindowsFormsApplication1
             }
 
             toolStripStatusLabel1.Text = "Done!";
+            button1.Enabled = true;
         }
 
         private void TextBox1_TextChanged(object sender, EventArgs e)
         {
             //ScanContentFolder(TextBox1.Text);
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            Control.CheckForIllegalCrossThreadCalls = false;
+            RegistryKey key;
+            key = Registry.CurrentUser.OpenSubKey("BypassHash");
+            if (key != null)
+            {
+                try
+                {
+                    contentPath = (string)key.GetValue("ContentPath");
+                    TextBox1.Text = contentPath;
+                    ScanContentFolder(contentPath);
+                    toolStripStatusLabel1.Text = "Loaded last used directory";
+                    string[] splitServerDir = contentPath.Replace("\\Workshop\\Content", "").Split("\\".ToCharArray());
+                    serverName = splitServerDir[splitServerDir.Length - 1];
+                    Label2.Text = "Are these your mods installed on '" + serverName + "'?";
+                }
+                catch (Exception)
+                {
+                    
+                }
+            }
         }
     }
 }
