@@ -7,4 +7,4 @@ Depending on how many mods you have depends on how long this will take, I am mak
 # When I restart USO, i have to apply the fix again? Why
 In USO, go to USO Settings, Updates and untick "Auto-update workshop content on USO-Start". This should stop USO from forcing you to reapply the fix. 
 # Latest Builds
-For those lazy people who don't want to or _can't_ build the given project, [Click Here](https://github.com/Like50Wizards/UnturnedBypassHashVerification/releases/tag/BHV)
+For those lazy people who don't want to or _can't_ build the given project, [Click Here](https://github.com/Like50Wizards/UnturnedBypassHashVerification/releases/latest)
