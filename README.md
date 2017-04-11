@@ -8,3 +8,5 @@ Depending on how many mods you have depends on how long this will take, I am mak
 In USO, go to USO Settings, Updates and untick "Auto-update workshop content on USO-Start". This should stop USO from forcing you to reapply the fix. 
 ## Latest Builds
 For those lazy people who don't want to or _can't_ build the given project, [Click Here](https://github.com/Like50Wizards/UnturnedBypassHashVerification/releases/latest)
+### Donate towards my work
+If you like my work enough, you might consider donating. If you do want to donate you can donate [here](https://twitch.streamlabs.com/sup3rninj4z#/) which is my Twitch donation link, or if you want to donate directly via PayPal then go [here](https://www.paypal.me/KFisher197/1)
